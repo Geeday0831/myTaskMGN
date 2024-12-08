@@ -16,8 +16,8 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
     .catch(err => console.error('MongoDB connection error:', err));
 
 // Routes spaces
-const authRoutes = require('../routes/authRoutes');
-const taskRoutes = require('../routes/taskRoutes');
+const authRoutes = require('./routes/authRoutes');
+const taskRoutes = require('./routes/taskRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
