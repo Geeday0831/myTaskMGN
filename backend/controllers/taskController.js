@@ -1,4 +1,4 @@
-const Task = require('../models/Task');
+const Task = require('../models/task');
 
 const createTask = async (req, res) => {
     const { name, description, dueDate, priority, category } = req.body;
@@ -36,7 +36,7 @@ const updateTask = async (req, res) => {
         if (task.userId.toString() !== req.user.id)
             return res.status(403).json({ message: 'Not authorized to update this task' });
 
-        Object.assign(task, req.body); // Update task with provided fields
+        Object.assign(task, req.body); // update my users task for them 
         const updatedTask = await task.save();
         res.json(updatedTask);
     } catch (error) {
