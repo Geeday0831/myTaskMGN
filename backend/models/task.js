@@ -1,15 +1,14 @@
+
 const mongoose = require('mongoose');
 
-// Task schema
 const taskSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    description: { type: String },
-    dueDate: { type: Date },
-    priority: { type: String },
-    category: { type: String },
+    description: String,
+    dueDate: Date,
+    priority: String,
+    category: String,
     completed: { type: Boolean, default: false },
-}, {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
-});
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+}, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);

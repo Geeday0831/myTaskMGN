@@ -1,39 +1,62 @@
-const Task = require('../models/task');
+const Task = require('../models/Task');
 
-// Fetch all tasks
+const createTask = async (req, res) => {
+    const { name, description, dueDate, priority, category } = req.body;
+
+    try {
+        const task = new Task({
+            name,
+            description,
+            dueDate,
+            priority,
+            category,
+            userId: req.user.id,
+        });
+        const savedTask = await task.save();
+        res.status(201).json(savedTask);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 const getTasks = async (req, res) => {
     try {
-        const tasks = await Task.find();
-        res.status(200).json(tasks);
-    } catch (err) {
-        res.status(500).json({ message: 'Error fetching tasks', error: err.message });
+        const tasks = await Task.find({ userId: req.user.id });
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
-// Create a new task
-const createTask = async (req, res) => {
-    try {
-        const { name, description, dueDate, priority, category } = req.body;
-        const newTask = new Task({ name, description, dueDate, priority, category });
-        await newTask.save();
-        res.status(201).json(newTask);
-    } catch (err) {
-        res.status(400).json({ message: 'Error creating task', error: err.message });
-    }
-};
-
-// Update a task's completion status
 const updateTask = async (req, res) => {
     try {
         const task = await Task.findById(req.params.id);
         if (!task) return res.status(404).json({ message: 'Task not found' });
 
-        task.completed = req.body.completed;
-        await task.save();
-        res.status(200).json(task);
-    } catch (err) {
-        res.status(500).json({ message: 'Error updating task', error: err.message });
+        if (task.userId.toString() !== req.user.id)
+            return res.status(403).json({ message: 'Not authorized to update this task' });
+
+        Object.assign(task, req.body); // Update task with provided fields
+        const updatedTask = await task.save();
+        res.json(updatedTask);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
-module.exports = { getTasks, createTask, updateTask };
+const deleteTask = async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.id);
+        if (!task) return res.status(404).json({ message: 'Task not found' });
+
+        if (task.userId.toString() !== req.user.id)
+            return res.status(403).json({ message: 'Not authorized to delete this task' });
+
+        await task.remove();
+        res.json({ message: 'Task deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { createTask, getTasks, updateTask, deleteTask };
