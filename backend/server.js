@@ -1,25 +1,27 @@
-// defining my variables
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 
-// Initialize Express app for the program
+const taskRoutes = require('./routes/taskRoutes');
+const errorHandler = require('./middleware/errorHandler');
+
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-//Here i have the MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('Connected to MongoDB Atlas'))
-    .catch(err => console.error('MongoDB connection error:', err));
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('Connected to MongoDB'))
+    .catch((err) => console.error('MongoDB connection error:', err));
 
-// Routes spaces
-const authRoutes = require('./routes/authRoutes');
-const taskRoutes = require('./routes/taskRoutes');
-app.use('/api/auth', authRoutes);
+// Routes
 app.use('/api/tasks', taskRoutes);
 
-// Export Express app as a Vercel function. i only applied this method because the fly.io kept requesting for my card details for registration and also refuses to work with the input where used.
+// Error handling middleware
+app.use(errorHandler);
+
 module.exports = app;
