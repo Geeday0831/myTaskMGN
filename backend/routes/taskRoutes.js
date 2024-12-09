@@ -1,12 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const tasksController = require('../controllers/tasksController');
-const authenticateToken = require('../middleware/authMiddleware');
-const validateTask = require('../middleware/validateTask');
+const taskController = require('../controllers/taskController');  // Ensure this is correctly referenced
 
-// Task routes
-router.get('/', authenticateToken, tasksController.getAllTasks);
-router.post('/', authenticateToken, validateTask, tasksController.createTask);
-router.patch('/:id', authenticateToken, tasksController.updateTask);
+// Example route
+router.get('/tasks', taskController.getAllTasks);  // Ensure `taskController.getAllTasks` is a valid function
 
 module.exports = router;
